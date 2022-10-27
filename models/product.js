@@ -20,9 +20,10 @@ const productSchema = mongoose.Schema({
     image: {
         type: String,
         require: true
-    }
+    },
+    rating: Number
 })
 
-const user = mongoose.model("user", productSchema);
+const products = mongoose.model("products", productSchema);
 
-module.exports = user;
+module.exports = products;
