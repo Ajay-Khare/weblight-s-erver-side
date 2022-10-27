@@ -3,6 +3,7 @@ const express = require("express")
 const router = express.Router();
 router.use(express.json());
 const products = require("../models/product");
+const cart = require("../models/userCart");
 const user = require("../models/user")
 const bcrypt = require("bcrypt");
 var jwt = require('jsonwebtoken');
@@ -16,31 +17,9 @@ router.get("/", (req, res) => {
 })
 
 
-// filling data in our DataBase throgh online test API
-// async function fillData(api) {
-//     const data = await products.find();
-//     if (data.length < 1) {
-//         data.map(async ele => {
-//             console.log(ele)
-//             await products.create({
-//                 title: ele.title,
-//                 price: ele.price,
-//                 category: ele.category,
-//                 description: ele.description,
-//                 image: ele.image,
-//                 rating:ele.rating.rate
-//             })
-//         })
-//     }
-//     console.log("executed")
-// }
-// const api = "https://fakestoreapi.com/products"
-// fillData(api)
-
-
+// API to register new user
 router.post("/register", async (req, res) => {
     const { name, email, password } = req.body;
-    // console.log(req.body)
     const data = await user.findOne({ email });
     if (data) {
         return res.send({ message: "user allready registered" });
@@ -62,6 +41,7 @@ router.post("/register", async (req, res) => {
 })
 
 
+// API for login existing user.
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
     const data = await user.findOne({ email });
@@ -86,5 +66,11 @@ router.post("/login", async (req, res) => {
     });
 })
 
+
+// API to handle requests related to cart.
+router.post("/cart", async (req, res) => {
+    const { productName } = req.body;
+    
+})
 
 module.exports = router
