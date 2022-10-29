@@ -109,7 +109,10 @@ router.patch("/quantity", validateToken, async (req, res) => {
         const data = await cart.updateOne({ _id: id }, { quantity: oldQty - 1 });
         res.send({ message: "success" });
     }
+})
 
+router.patch("/purchase", (req, res) => {
+    
 })
 
 module.exports = router
