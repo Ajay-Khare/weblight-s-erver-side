@@ -70,13 +70,14 @@ router.post("/login", async (req, res) => {
 
 // API to handle requests related to cart.
 router.post("/cart", validateToken, async (req, res) => {
-    const { product } = req.body;
-    const userCart = await cart.find({ $and: [ {userid: req.user}, {product: product} ] })
+    const { product, price } = req.body;
+    const userCart = await cart.find({ $and: [{ userid: req.user }, { product: product }] })
     if (userCart.length === 0) {
         if (product) {
             const data = await cart.create({
                 userid: req.user,
-                product: product
+                product: product,
+                price
             })
             res.send({ message: "success" })
         }
@@ -85,7 +86,7 @@ router.post("/cart", validateToken, async (req, res) => {
         }
     }
     else {
-        res.send({message:"item allready exist in cart"})
+        res.send({ message: "item allready exist in cart" })
     }
 
 
@@ -94,6 +95,21 @@ router.post("/cart", validateToken, async (req, res) => {
 router.get("/cart", validateToken, async (req, res) => {
     const data = await cart.find({ userid: req.user });
     res.send(data)
+})
+
+router.patch("/quantity", validateToken, async (req, res) => {
+    const { qty, id } = req.body;
+    const oldData = await cart.findOne({ _id: id });
+    let oldQty = oldData.quantity;
+    if (qty) {
+        const data = await cart.updateOne({ _id: id }, { quantity: oldQty + 1 });
+        res.send({ message: "success" });
+    }
+    if (!qty && oldData.quantity > 1) {
+        const data = await cart.updateOne({ _id: id }, { quantity: oldQty - 1 });
+        res.send({ message: "success" });
+    }
+
 })
 
 module.exports = router
