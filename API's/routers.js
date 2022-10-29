@@ -122,6 +122,16 @@ router.patch("/purchase", validateToken, async (req, res) => {
     }
 })
 
-
+router.get("/purchaseHistory",validateToken,async (req, res) => {
+    try {
+        const data = await cart.find({ $: [{ userid: req.user }, { purchaseStatus: true }] });
+        if (data.length === 0) {
+            return res.status(200).send({message:"no data available"})
+        }
+        res.status(200).send({message:"data available", data});
+    } catch (error) {
+        res.status(400).send(err.message)
+    }
+})
 
 module.exports = router
