@@ -71,15 +71,27 @@ router.post("/login", async (req, res) => {
 // API to handle requests related to cart.
 router.post("/cart", validateToken, async (req, res) => {
     const { product } = req.body;
-    // console.log(product, req.body)
-    const data = await cart.create({
-        userid: req.user,
-        product: product
-    })
-    res.send({ message: "success" })
+    const userCart = await cart.find({ $and: [ {userid: req.user}, {product: product} ] })
+    if (userCart.length === 0) {
+        if (product) {
+            const data = await cart.create({
+                userid: req.user,
+                product: product
+            })
+            res.send({ message: "success" })
+        }
+        else {
+            res.send({ message: "empty data" })
+        }
+    }
+    else {
+        res.send({message:"item allready exist in cart"})
+    }
+
+
 })
 
-router.get("/cart",validateToken,async (req, res) => {
+router.get("/cart", validateToken, async (req, res) => {
     const data = await cart.find({ userid: req.user });
     res.send(data)
 })
