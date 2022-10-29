@@ -57,7 +57,7 @@ router.post("/login", async (req, res) => {
             return res.send(err.message)
         }
         if (!result) {
-            return res.send("Incorrect Password")
+            return res.send({message:"Incorrect Password"})
         }
         const token = await jwt.sign({
             exp: Math.floor(Date.now() / 1000) + (60 * 60),
@@ -71,7 +71,7 @@ router.post("/login", async (req, res) => {
 // API to handle requests related to cart.
 router.post("/cart", validateToken, async (req, res) => {
     const { product, price } = req.body;
-    const userCart = await cart.find({ $and: [{ userid: req.user }, { product: product }] })
+    const userCart = await cart.find({ $and: [{ userid: req.user }, { product: product }, { purchaseStatus: false }] })
     if (userCart.length === 0) {
         if (product) {
             const data = await cart.create({
@@ -93,7 +93,7 @@ router.post("/cart", validateToken, async (req, res) => {
 })
 
 router.get("/cart", validateToken, async (req, res) => {
-    const data = await cart.find({ userid: req.user });
+    const data = await cart.find({ $and: [{ userid: req.user }, { purchaseStatus: false }] });
     res.send(data)
 })
 
@@ -111,8 +111,17 @@ router.patch("/quantity", validateToken, async (req, res) => {
     }
 })
 
-router.patch("/purchase", (req, res) => {
-    
+router.patch("/purchase", validateToken, async (req, res) => {
+    const cartData = await cart.find({ userid: req.user });
+    if (cartData) {
+        const data = await cart.updateMany({ userid: req.user }, { purchaseStatus: true });
+        res.send({ message: "success" });
+    }
+    else {
+        res.send({ message: "no data found in cart" });
+    }
 })
+
+
 
 module.exports = router
