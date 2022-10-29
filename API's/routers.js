@@ -8,6 +8,7 @@ const user = require("../models/user")
 const bcrypt = require("bcrypt");
 var jwt = require('jsonwebtoken');
 const cors = require("cors")
+const { validateToken } = require("../middleware/athentication");
 router.use(cors());
 
 
@@ -68,9 +69,19 @@ router.post("/login", async (req, res) => {
 
 
 // API to handle requests related to cart.
-router.post("/cart", async (req, res) => {
-    const { productName } = req.body;
-    
+router.post("/cart", validateToken, async (req, res) => {
+    const { product } = req.body;
+    // console.log(product, req.body)
+    const data = await cart.create({
+        userid: req.user,
+        product: product
+    })
+    res.send({ message: "success" })
+})
+
+router.get("/cart",validateToken,async (req, res) => {
+    const data = await cart.find({ userid: req.user });
+    res.send(data)
 })
 
 module.exports = router
