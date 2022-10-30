@@ -7,7 +7,8 @@ const router = require("./API's/routers")
 app.use(router)
 
 // connection with DB
-mongoose.connect("mongodb://localhost:27017/EcomApp", (err) => {
+const pass = process.env.dbPass;
+mongoose.connect(`mongodb+srv://Ajay:${pass}@cluster0.69nrddt.mongodb.net/E-commerce?retryWrites=true&w=majority`, (err) => {
     if (err) {
         console.log(err.message);
     }
